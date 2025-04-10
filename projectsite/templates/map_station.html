@@ -1,6 +1,4 @@
-{% extends 'base.html' %}
-{% load static %}
-{% block content %}
+{% extends 'base.html' %} {% load static %} {% block content %}
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
 
@@ -48,21 +46,28 @@
 
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 <script>
-  var map = L.map("map").setView([9.81644, 118.722391], 13);
+    var map = L.map("map").setView([9.81644, 118.722391], 13);
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution:
-      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-  }).addTo(map);
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
 
-  var truckIcon = L.icon({
+    var truckIcon = L.icon({
     iconUrl: "{% static 'img/firetruck.png' %}",
     iconSize: [50, 50]
-  });
+    });
 
   // Example marker using truck icon
-  L.marker([9.81644, 118.722391], { icon: truckIcon }).addTo(map)
-    .bindPopup("Fire Station");
+    L.marker([9.83369118406607, 118.72275445554], { icon: truckIcon }).addTo(map)
+        .bindPopup("Sta. Lourdes");
+
+    L.marker([9.82084079557777, 118.74401369655], { icon: truckIcon }).addTo(map)
+        .bindPopup("Tagburos");
+
+    L.marker([9.79555573875096, 118.710565836493], { icon: truckIcon }).addTo(map)
+        .bindPopup("Sicsican");
+
 </script>
 
 {% endblock %}
