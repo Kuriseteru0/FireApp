@@ -26,19 +26,21 @@ class ChartView(ListView):
 
 def PieCountbySeverity(request):
     query = '''
-        SELECT severity_level, COUNT(*) as count
-        FROM fire_incident
-        GROUP BY severity_level
-        '''
+    SELECT severity_level, COUNT(*) as count
+    FROM fire_incident
+    GROUP BY severity_level
+    '''
     data = {}
     with connection.cursor() as cursor:
         cursor.execute(query)
         rows = cursor.fetchall()
-        if rows:
-            # Construct the dictionary with severity level as keys and count as values
-            data = {severity: count for severity, count in rows}
-        else:
-            data = {}
+
+    if rows:
+        # Construct the dictionary with severity level as keys and count as values
+        data = {severity: count for severity, count in rows}
+    else:
+        data = {}
+        
     return JsonResponse(data)
 
 def map_station(request):
