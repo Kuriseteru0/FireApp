@@ -8,22 +8,12 @@ from django.db.models.functions import ExtractMonth
 from django.db.models import Count
 from datetime import datetime
 from django.views.generic import TemplateView
-from .models import FireIncident  
-import os
-from django.urls import path
-from fire import views
-from django.contrib import admin
+from .models import FireIncident  # Ensure you have a model for fire incidents
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-TEMPLATES = [
-    {
-        "DIRS": [os.path.join(BASE_DIR, 'templates')],
-    },
-]
 
 class HomePageView(TemplateView):
     template_name = 'home.html'  # Ensure this template exists
+
 class ChartView(ListView):
     template_name = 'chart.html'
 
@@ -209,14 +199,3 @@ def map_fire_incidents(request):
         for incident in incidents
     ]
     return JsonResponse(data, safe=False)
-
-def jqvmap_view(request):
-    return render(request, 'maps/jqvmap.html')
-
-urlpatterns = [
-    path("admin/", admin.site.urls),
-    path('', views.HomePageView.as_view(), name='home'),
-    path('map_station/', views.map_station, name='map_station'),
-    path('fireIncidents/', views.map_fire_incidents, name='map_fire_incidents'),
-    path('maps/jqvmap.html', views.jqvmap_view, name='jqvmap'),  # Add this line
-]
