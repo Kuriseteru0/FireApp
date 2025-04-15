@@ -1,4 +1,6 @@
-{% extends 'base.html' %} {% load static %} {% block content %}
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
 
@@ -26,6 +28,24 @@
     </ul>
   </div>
 
+  <!-- Filter Dropdown -->
+  <div class="col-md-12">
+    <div class="card card-transparent">
+      <div class="card-body">
+        <div class="col-md-4 ml-auto mr-auto">
+          <label for="cityFilter">Filter by City:</label>
+          <select id="cityFilter" class="form-control">
+            <option value="all">All Cities</option>
+            <option value="PPCA">PPC A</option>
+            <option value="PPCB">PPC B</option>
+            <option value="PPCC">PPC C</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Map Container -->
   <div class="col-md-12">
     <div class="card card-transparent">
       <div class="card-header">
@@ -42,37 +62,52 @@
 
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 <script>
-    var map = L.map("map").setView([9.81644, 118.722391], 13);
+  // Initialize the map
+  var map = L.map("map").setView([9.81644, 118.722391], 13);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
 
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
+  // Define the incident icon
+  var incidentIcon = L.icon({
+    iconUrl: "{% static 'img/fireincident.png' %}",
+    iconSize: [50, 50],
+    iconAnchor: [25, 50],
+    popupAnchor: [0, -50]
+  });
 
-    var incidentIcon = L.icon({
-      iconUrl: "{% static 'img/fireincident.png' %}",
-      iconSize: [50, 50],
+  // Array of incidents with lat, lng, popup text, and city designation.
+  var incidentData = [
+    { lat: 9.7638, lng: 118.7473, popup: "San Pedro", city: "PPCA" },
+    { lat: 9.7461, lng: 118.7577, popup: "San Miguel", city: "PPCA" },
+    { lat: 9.7706, lng: 118.7635, popup: "San Manuel", city: "PPCB" },
+    { lat: 9.7722, lng: 118.7460, popup: "Tiniguiban", city: "PPCB" },
+    { lat: 9.8010, lng: 118.6973, popup: "Irawan", city: "PPCC" },
+    { lat: 9.6715, lng: 118.7256, popup: "Luzviminda", city: "PPCC" },
+    { lat: 9.7389, lng: 118.7336, popup: "Magkakaibigan", city: "PPCA" }
+  ];
+
+  // Layer group to hold markers
+  var markersLayer = L.layerGroup().addTo(map);
+
+  // Function to render markers based on the selected city filter
+  function renderMarkers(filterCity) {
+    markersLayer.clearLayers();
+    incidentData.forEach(function(incident) {
+      if (filterCity === "all" || incident.city === filterCity) {
+        L.marker([incident.lat, incident.lng], { icon: incidentIcon })
+          .addTo(markersLayer)
+          .bindPopup(incident.popup);
+      }
     });
+  }
 
-    // Example marker using fire icon
-    L.marker([9.7638, 118.7473], { icon: incidentIcon }).addTo(map)
-      .bindPopup("San Pedro");
+  // Initial render for all incidents
+  renderMarkers("all");
 
-    L.marker([9.7461, 118.7577], { icon: incidentIcon }).addTo(map)
-      .bindPopup("San Miguel");
-
-    L.marker([9.7706, 118.7635], { icon: incidentIcon }).addTo(map)
-      .bindPopup("San Manuel");
-
-    L.marker([9.7722, 118.7460], { icon: incidentIcon }).addTo(map)
-    .bindPopup("Tiniguiban");
-
-    L.marker([9.8010, 118.6973], { icon: incidentIcon }).addTo(map)
-    .bindPopup("Irawan");
-
-    L.marker([9.6715, 118.7256], { icon: incidentIcon }).addTo(map)
-    .bindPopup("Luzviminda");
-
-    L.marker([9.7389, 118.7336], { icon: incidentIcon }).addTo(map)
-    .bindPopup("Magkakaibigan");
+  // Event listener for filter changes
+  document.getElementById("cityFilter").addEventListener("change", function() {
+    renderMarkers(this.value);
+  });
 </script>
 {% endblock %}
