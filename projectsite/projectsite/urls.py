@@ -12,6 +12,7 @@ urlpatterns = [
     path('lineChart/', LineCountByMonth, name='chart'),
     path('multilineChart/', MultilineIncidentTop3Country, name='chart'),
     path('multiBarChart/', multipleBarbySeverity, name='chart'),
-    path('stations', views.map_station, name='map_station'),
+    path('map_stations', views.map_station, name='map_station'),
     path('fireIncidents', views.map_fire_incidents, name='map_fire_incidents'),
+    path('maps/jqvmap.html', views.jqvmap_view, name='jqvmap'),  # Add this line
 ]
