@@ -7,12 +7,12 @@ from django.db.models.functions import ExtractMonth
 
 from django.db.models import Count
 from datetime import datetime
+from django.views.generic import TemplateView
+from .models import FireIncident  # Ensure you have a model for fire incidents
 
 
-class HomePageView(ListView):
-    model = Locations
-    context_object_name = 'home'
-    template_name = "home.html"
+class HomePageView(TemplateView):
+    template_name = 'home.html'  # Ensure this template exists
 
 class ChartView(ListView):
     template_name = 'chart.html'
@@ -180,3 +180,22 @@ def map_station(request):
     }
 
     return render(request, 'map_station.html', context)
+
+def map_fire_incidents(request):
+    if request.method == "GET" and "city" in request.GET:
+        city = request.GET.get("city")
+        incidents = FireIncident.objects.filter(city__iexact=city) 
+    else:
+        incidents = FireIncident.objects.all()  
+
+    data = [
+        {
+            "id": incident.id,
+            "latitude": incident.latitude,
+            "longitude": incident.longitude,
+            "city": incident.city,
+            "severity": incident.severity,
+        }
+        for incident in incidents
+    ]
+    return JsonResponse(data, safe=False)
