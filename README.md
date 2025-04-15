@@ -53,5 +53,5 @@ FireApp is a web-based application that displays fire stations and fire incident
 
 ## Notes
 
-- This README focuses on the mapping functionality. Other features such as the charts have been temporarily disregarded.
-- Ensure that the required static assets (like `fireincident.png` and `firetruck.png`) are available in the appropriate `static/img` directory.
+- This README focuses on the mapping functionality. Other features have been temporarily disabled.
+- The required static assets (like `fireincident.png` and `firetruck.png`) are available in the appropriate `static/img` directory.
