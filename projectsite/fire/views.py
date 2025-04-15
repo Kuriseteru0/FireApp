@@ -180,3 +180,17 @@ def map_station(request):
     }
 
     return render(request, 'map_station.html', context)
+
+def map_incidents(request):
+    incidents = Incident.objects.select_related('location').values(
+        'id', 'location__latitude', 'location__longitude', 'description'
+    )
+    # Convert coordinates to float for Leaflet
+    for incident in incidents:
+        incident['latitude'] = float(incident['location__latitude'])
+        incident['longitude'] = float(incident['location__longitude'])
+    incidents_list = list(incidents)
+    context = {
+        'fireIncidents': incidents_list,
+    }
+    return render(request, 'incidents_map.html', context)
