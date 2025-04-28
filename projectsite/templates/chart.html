@@ -37,7 +37,7 @@
                 </div>
                 <div class="card-body">
                     <div class="chart-container">
-                        <canvas id="pieChart" style="width: 50%; height: 50%"></canvas>
+                        <canvas id="pieChart" style="width:100%;height:400px;"></canvas>
                     </div>
                 </div>
             </div>
@@ -121,24 +121,25 @@
         </div>
     </div>
 </div>
-{% endblock %} {% block chart %} 
+{% endblock %} {% block chart %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     function loadChartData() {
         // pieChart 
         fetch("/pieChart/")
             .then((response) => response.json())
             .then((data) => {
+                console.log("Fetched pie chart data:", data);
                 var severityLevels = Object.keys(data);
                 var counts = Object.values(data);
-                var piechart = document.getElementById("pieChart").getContext("2d");
-                console.log("call");
-                new Chart(piechart, {
+                var pieCtx = document.getElementById("pieChart").getContext("2d");
+                new Chart(pieCtx, {
                     type: "pie",
                     data: {
                         datasets: [{
                             data: counts,
                             backgroundColor: ["#1d7af3", "#f3545d", "#fdaf4b"],
-                            borderWidth: 0,
+                            borderWidth: 1,
                         }],
                         labels: severityLevels,
                     },
@@ -152,27 +153,24 @@
                                 fontSize: 11,
                                 usePointStyle: true,
                                 padding: 20,
-                            }
+                            },
                         },
-                        pieceLabel: {
-                            render: "percentage",
-                            fontColor: "white",
-                            fontSize: 14,
+                        tooltips: {
+                            enabled: true,
                         },
-                        tooltips: false,
                         layout: {
                             padding: {
                                 left: 20,
                                 right: 20,
                                 top: 20,
                                 bottom: 20,
-                            }
-                        }
+                            },
+                        },
                     }
                 });
             })
-            .catch((error) => console.error("Error:", error));
-
+            .catch((error) => console.error("Error fetching pie chart data:", error));
+        
     // lineChart
     fetch("/lineChart/")
         .then(response => response.json())
