@@ -174,16 +174,17 @@ def map_station(request):
     return render(request, 'map_station.html', context)
 
 def map_incidents(request):
-    incidents = Incident.objects.select_related('location').values(
-        'id', 'location__latitude', 'location__longitude', 'description'
-    )
-    # Convert coordinates to float for Leaflet
-    for incident in incidents:
-        incident['latitude'] = float(incident['location__latitude'])
-        incident['longitude'] = float(incident['location__longitude'])
-    incidents_list = list(incidents)
+    incidents = Incident.objects.select_related('location').all()
+    fireIncidents = [{
+         'id': incident.id,
+         'latitude': float(incident.location.latitude),
+         'longitude': float(incident.location.longitude),
+         'description': incident.description
+    } for incident in incidents]
+    severity_levels = ["Minor Fire", "Moderate Fire", "Major Fire"]
     context = {
-        'fireIncidents': incidents_list,
+        'fireIncidents': fireIncidents,
+        'severity_levels': severity_levels,
     }
     return render(request, 'incidents_map.html', context)
 
@@ -235,4 +236,62 @@ def delete_station(request):
             messages.error(request, "Station not found!")
         return redirect('map_station')
     return redirect('map_station')
+
+def add_incident(request):
+    if request.method == 'POST':
+        description = request.POST.get('description')
+        latitude = request.POST.get('latitude')
+        longitude = request.POST.get('longitude')
+        try:
+            latitude = float(latitude)
+            longitude = float(longitude)
+            # Create a new location record
+            location = Locations.objects.create(latitude=latitude, longitude=longitude)
+            # Create a new incident with the location and description
+            Incident.objects.create(location=location, description=description)
+            messages.success(request, "Incident added successfully!")
+        except Exception as e:
+            messages.error(request, "Error adding incident: " + str(e))
+        return redirect('map_incidents')
+    return redirect('map_incidents')
+
+def edit_incident(request):
+    if request.method == 'POST':
+        incident_id = request.POST.get('incident_id')
+        incident = get_object_or_404(Incident, id=incident_id)
+        new_description = request.POST.get('new_description')
+        new_latitude = request.POST.get('new_latitude')
+        new_longitude = request.POST.get('new_longitude')
+        try:
+            if new_description:
+                incident.description = new_description
+            if new_latitude and new_longitude:
+                new_lat = float(new_latitude)
+                new_lon = float(new_longitude)
+                # Update the related location record
+                location = incident.location
+                location.latitude = new_lat
+                location.longitude = new_lon
+                location.save()
+            incident.save()
+            messages.info(request, "Incident updated successfully!")
+        except Exception as e:
+            messages.error(request, "Error updating incident: " + str(e))
+        return redirect('map_incidents')
+    return redirect('map_incidents')
+
+def delete_incident(request):
+    if request.method == 'POST':
+        incident_id = request.POST.get('incident_id')
+        try:
+            incident = Incident.objects.get(id=incident_id)
+            # Optionally delete the associated location if not used elsewhere
+            location_id = incident.location.id
+            incident.delete()
+            Locations.objects.filter(id=location_id).delete()
+            messages.error(request, "Incident deleted successfully!")
+        except Incident.DoesNotExist:
+            messages.error(request, "Incident not found!")
+        return redirect('map_incidents')
+    return redirect('map_incidents')
 
