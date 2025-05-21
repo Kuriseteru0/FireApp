@@ -241,10 +241,37 @@
         </footer>
       </div>
     </div>
+
+    {% if messages %}
+    <script>
+      $(document).ready(function() {
+        {% for message in messages %}
+          $.notify({
+            // You can use an icon here if you want
+            message: "{{ message|escapejs }}"
+          },{
+            type: "{% if message.tags %}{{ message.tags }}{% else %}info{% endif %}",
+            placement: {
+              from: "top",
+              align: "right"
+            },
+            delay: 2000,
+            allow_dismiss: true,
+            offset: {
+              x: 20,
+              y: 70
+            }
+          });
+        {% endfor %}
+      });
+    </script>
+    {% endif %}
+
     <!--   Core JS Files   -->
     <script src="{% static 'js/core/jquery.3.2.1.min.js' %}"></script>
     <script src="{% static 'js/core/popper.min.js' %}"></script>
     <script src="{% static 'js/core/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/plugin/bootstrap-notify/bootstrap-notify.min.js' %}"></script>
 
     <!-- jQuery UI -->
     <script src="{% static 'js/plugin/jquery-ui-1.12.1.custom/jquery-ui.min.js' %}"></script>

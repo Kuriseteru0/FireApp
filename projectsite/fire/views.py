@@ -1,9 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic.list import ListView
 from fire.models import Locations, Incident, FireStation
 from django.db import connection
 from django.http import JsonResponse
 from django.db.models.functions import ExtractMonth
+from django.contrib import messages
 
 from django.db.models import Count
 from datetime import datetime
@@ -158,18 +159,18 @@ def multipleBarbySeverity(request):
 
 
 def map_station(request):
-    fireStations = FireStation.objects.values('name', 'latitude', 'longitude')
-
-    for fs in fireStations:
-        fs['latitude'] = float(fs['latitude'])
-        fs['longitude'] = float(fs['longitude'])
-    
-    fireStations_list = list(fireStations)
+    stations = FireStation.objects.all()  # Query all stations
+    # Create a list for markers with float coordinates
+    fireStations_list = [{
+        'name': station.name,
+        'latitude': float(station.latitude),
+        'longitude': float(station.longitude),
+    } for station in stations]
 
     context = {
-        'fireStations': fireStations_list,
+        'fireStations': fireStations_list,  # used for displaying markers on the map
+        'stations': stations,                # used to populate select boxes for edit and delete
     }
-
     return render(request, 'map_station.html', context)
 
 def map_incidents(request):
@@ -185,3 +186,53 @@ def map_incidents(request):
         'fireIncidents': incidents_list,
     }
     return render(request, 'incidents_map.html', context)
+
+def add_station(request):
+    if request.method == 'POST':
+        station_name = request.POST.get('name')
+        latitude = request.POST.get('latitude')
+        longitude = request.POST.get('longitude')
+        try:
+            latitude = float(latitude)
+            longitude = float(longitude)
+            new_station = FireStation(name=station_name, latitude=latitude, longitude=longitude)
+            new_station.save()
+            messages.success(request, "Station added successfully!")
+        except Exception as e:
+            messages.error(request, "Error adding station: " + str(e))
+        return redirect('map_station')
+    return redirect('map_station')
+
+def edit_station(request):
+    if request.method == 'POST':
+        station_id = request.POST.get('station_id')
+        station = get_object_or_404(FireStation, id=station_id)
+        new_name = request.POST.get('new_name')
+        new_latitude = request.POST.get('new_latitude')
+        new_longitude = request.POST.get('new_longitude')
+        try:
+            if new_name:
+                station.name = new_name
+            if new_latitude:
+                station.latitude = float(new_latitude)
+            if new_longitude:
+                station.longitude = float(new_longitude)
+            station.save()
+            messages.info(request, "Station updated successfully!")
+        except Exception as e:
+            messages.error(request, "Error updating station: " + str(e))
+        return redirect('map_station')
+    return redirect('map_station')
+
+def delete_station(request):
+    if request.method == 'POST':
+        station_id = request.POST.get('station_id')
+        try:
+            station = FireStation.objects.get(id=station_id)
+            station.delete()
+            messages.error(request, "Station deleted successfully!")
+        except FireStation.DoesNotExist:
+            messages.error(request, "Station not found!")
+        return redirect('map_station')
+    return redirect('map_station')
+
