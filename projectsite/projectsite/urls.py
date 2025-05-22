@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path
 
-from fire.views import HomePageView, ChartView, PieCountbySeverity, LineCountByMonth, MultilineIncidentTop3Country, multipleBarbySeverity, map_incidents, LocationList, LocationCreateView, LocationUpdateView, LocationDeleteView, IncidentList, IncidentCreateView, IncidentUpdateView, IncidentDeleteView, FireStationList, FireStationCreateView, FireStationUpdateView, FireStationDeleteView, FirefightersList, FirefightersCreateView, FirefightersUpdateView, FirefightersDeleteView, FireTruckList, FireTruckCreateView, FireTruckUpdateView, FireTruckDeleteView
+from fire.views import HomePageView, ChartView, PieCountbySeverity, LineCountByMonth, MultilineIncidentTop3Country, multipleBarbySeverity, map_incidents, LocationList, LocationCreateView, LocationUpdateView, LocationDeleteView, IncidentList, IncidentCreateView, IncidentUpdateView, IncidentDeleteView, FireStationList, FireStationCreateView, FireStationUpdateView, FireStationDeleteView, FirefightersList, FirefightersCreateView, FirefightersUpdateView, FirefightersDeleteView, FireTruckList, FireTruckCreateView, FireTruckUpdateView, FireTruckDeleteView, WeatherConditionsList, WeatherConditionsCreateView, WeatherConditionsUpdateView, WeatherConditionsDeleteView
 from fire import views
 
 urlpatterns = [
@@ -34,4 +34,8 @@ urlpatterns = [
     path('firetrucks/add/', FireTruckCreateView.as_view(), name='firetrucks-add'),
     path('firetrucks/<pk>/', FireTruckUpdateView.as_view(), name='firetrucks-update'),
     path('firetrucks/<pk>/delete/', FireTruckDeleteView.as_view(), name='firetrucks-delete'),
+    path('weathercon/', WeatherConditionsList.as_view(), name='weathercon-list'),
+    path('weathercon/add/', WeatherConditionsCreateView.as_view(), name='weathercon-add'),
+    path('weathercon/<pk>/', WeatherConditionsUpdateView.as_view(), name='weathercon-update'),
+    path('weathercon/<pk>/delete/', WeatherConditionsDeleteView.as_view(), name='weathercon-delete'),
 ]
