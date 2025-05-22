@@ -1,13 +1,13 @@
 from django.shortcuts import render
 from django.views.generic.list import ListView
-from fire.models import Locations, Incident, FireStation, Firefighters
+from fire.models import Locations, Incident, FireStation, Firefighters, FireTruck
 from django.db import connection
 from django.http import JsonResponse
 from django.db.models.functions import ExtractMonth
 from django.contrib import messages
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
-from fire.forms import LocationForm, IncidentForm, FireStationForm, FirefightersForm
+from fire.forms import LocationForm, IncidentForm, FireStationForm, FirefightersForm, FireTruckForm
 from typing import Any
 from django.db.models.query import QuerySet
 from django.db.models import Q
@@ -321,3 +321,34 @@ class FirefightersDeleteView(DeleteView):
     model = Firefighters
     template_name = 'firefighters_del.html'
     success_url = reverse_lazy('firefighters-list')
+
+class FireTruckList(ListView):
+    model = FireTruck
+    context_object_name = 'object_list'
+    template_name = 'firetrucks_list.html'
+    paginate_by = 5
+
+    def get_queryset(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+        if self.request.GET.get('q'):
+            query = self.request.GET.get('q')
+            qs = qs.filter(Q(truck_number__icontains=query) | Q(model__icontains=query) | Q(capacity__icontains=query) | Q(station__name__icontains=query)
+            )
+        return qs
+
+class FireTruckCreateView(CreateView):
+    model = FireTruck
+    form_class = FireTruckForm
+    template_name = 'firetrucks_add.html'
+    success_url = reverse_lazy('firetrucks-list')
+
+class FireTruckUpdateView(UpdateView):
+    model = FireTruck
+    form_class = FireTruckForm
+    template_name = 'firetrucks_edit.html'
+    success_url = reverse_lazy('firetrucks-list')
+
+class FireTruckDeleteView(DeleteView):
+    model = FireTruck
+    template_name = 'firetrucks_del.html'
+    success_url = reverse_lazy('firetrucks-list')
