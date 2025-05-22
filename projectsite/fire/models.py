@@ -10,7 +10,7 @@ class BaseModel(models.Model):
 
 
 class Locations(BaseModel):
-    name = models.CharField(max_length=150)
+    name = models.CharField(max_length=255)
     latitude = models.DecimalField(
         max_digits=22, decimal_places=16, null=True, blank=True)
     longitude = models.DecimalField(
@@ -18,6 +18,9 @@ class Locations(BaseModel):
     address = models.CharField(max_length=150)
     city = models.CharField(max_length=150)  # can be in separate table
     country = models.CharField(max_length=150)  # can be in separate table
+
+    def __str__(self):
+        return self.name
 
 
 class Incident(BaseModel):
@@ -29,7 +32,11 @@ class Incident(BaseModel):
     location = models.ForeignKey(Locations, on_delete=models.CASCADE)
     date_time = models.DateTimeField(blank=True, null=True)
     severity_level = models.CharField(max_length=45, choices=SEVERITY_CHOICES)
-    description = models.CharField(max_length=250)
+    description = models.TextField()
+    date_time = models.DateTimeField()
+
+    def __str__(self):
+        return f"{self.description[:30]} ({self.date_time.date()})"
 
 
 class FireStation(BaseModel):

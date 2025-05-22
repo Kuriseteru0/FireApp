@@ -5,6 +5,12 @@ from django.db import connection
 from django.http import JsonResponse
 from django.db.models.functions import ExtractMonth
 from django.contrib import messages
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.urls import reverse_lazy
+from fire.forms import LocationForm, IncidentForm
+from typing import Any
+from django.db.models.query import QuerySet
+from django.db.models import Q
 
 from django.db.models import Count
 from datetime import datetime
@@ -196,3 +202,62 @@ def map_incidents(request):
     }
     return render(request, 'incidents_map.html', context)
 
+class LocationList(ListView):
+    model = Locations
+    context_object_name = 'object_list'
+    template_name = 'location_list.html'
+    paginate_by = 5
+
+    def get_queryset(self, *args, **kwargs):
+        qs = super(LocationList, self).get_queryset(*args, **kwargs)
+        if self.request.GET.get('q') != None:
+            query = self.request.GET.get('q')
+            qs = qs.filter(Q(name__icontains=query) | Q(address__icontains=query) | Q(city__icontains=query) | Q(country__icontains=query))
+        return qs
+
+class LocationCreateView(CreateView):
+    model = Locations
+    form_class = LocationForm
+    template_name = 'location_add.html'
+    success_url = reverse_lazy('location-list')
+
+class LocationUpdateView(UpdateView):
+    model = Locations
+    form_class = LocationForm
+    template_name = 'location_edit.html'
+    success_url = reverse_lazy('location-list')
+
+class LocationDeleteView(DeleteView):
+    model = Locations
+    template_name = 'location_del.html'
+    success_url = reverse_lazy('location-list')
+
+class IncidentList(ListView):
+    model = Incident
+    context_object_name = 'object_list'
+    template_name = 'incidents_list.html'
+    paginate_by = 5
+
+    def get_queryset(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+        if self.request.GET.get('q'):
+            query = self.request.GET.get('q')
+            qs = qs.filter(Q(description__icontains=query) | Q(severity_level__icontains=query))
+        return qs
+
+class IncidentCreateView(CreateView):
+    model = Incident
+    form_class = IncidentForm
+    template_name = 'incidents_add.html'
+    success_url = reverse_lazy('incident-list')
+
+class IncidentUpdateView(UpdateView):
+    model = Incident
+    form_class = IncidentForm
+    template_name = 'incidents_edit.html'
+    success_url = reverse_lazy('incident-list')
+
+class IncidentDeleteView(DeleteView):
+    model = Incident
+    template_name = 'incidents_del.html'
+    success_url = reverse_lazy('incident-list')
