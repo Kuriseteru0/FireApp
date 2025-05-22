@@ -12,7 +12,7 @@
                     <br />
                         <div class="col-md-12 row">
                             <div class="col-md-6">
-                                <form class="navbar-left navbar-form nav-search mr-md-3" action="{% url 'firestations-list' %}">
+                                <form class="navbar-left navbar-form nav-search mr-md-3" action="{% url 'firefighters-list' %}">
                                     <div class="input-group">
                                         <input type="text" placeholder="Search ..." class="form-control" name="q" />
                                         <div class="input-group-append">
@@ -25,7 +25,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="pull-right">
-                                    <a href="{% url 'firestations-add' %}" class="btn btn-success btn-rounded">Add Fire Station</a>
+                                    <a href="{% url 'firefighters-add' %}" class="btn btn-success btn-rounded">Add Fire Fighter</a>
                                 </div>
                             </div>
                         </div>
@@ -34,11 +34,9 @@
                             <thead>
                                 <tr>
                                     <th scope="col">Name</th>
-                                    <th scope="col">Latitude</th>
-                                    <th scope="col">Longitude</th>
-                                    <th scope="col">Address</th>
-                                    <th scope="col">City</th>
-                                    <th scope="col">Country</th>
+                                    <th scope="col">Rank</th>
+                                    <th scope="col">Experience Level</th>
+                                    <th scope="col">Station</th>
                                     <th scope="col">Action</th>
                                 </tr>
                             </thead>
@@ -46,19 +44,17 @@
                                 {% for object in object_list %}
                                 <tr>
                                     <td>{{ object.name }}</td>
-                                    <td>{{ object.latitude }}</td>
-                                    <td>{{ object.longitude }}</td>
-                                    <td>{{ object.address }}</td>
-                                    <td>{{ object.city }}</td>
-                                    <td>{{ object.country }}</td>
+                                    <td>{{ object.rank }}</td>
+                                    <td>{{ object.experience_level }}</td>
+                                    <td>{{ object.station }}</td>
                                     <td>
-                                        <a href="{% url 'firestation-update' object.id %}">Edit</a>
-                                        <a href="{% url 'firestation-delete' object.id %}" class="text-danger ml-2">Delete</a>
+                                        <a href="{% url 'firefighters-update' object.id %}">Edit</a>
+                                        <a href="{% url 'firefighters-delete' object.id %}" class="text-danger ml-2">Delete</a>
                                     </td>
                                 </tr>
                                 {% empty %}
                                 <tr>
-                                    <td colspan="7" style="text-align: center">
+                                    <td colspan="5" style="text-align: center">
                                         <p class="text-sm font-weight-bold mb-0">No Records Found</p>
                                     </td>
                                 </tr>

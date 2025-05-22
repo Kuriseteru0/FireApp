@@ -1,13 +1,13 @@
 from django.shortcuts import render
 from django.views.generic.list import ListView
-from fire.models import Locations, Incident, FireStation
+from fire.models import Locations, Incident, FireStation, Firefighters
 from django.db import connection
 from django.http import JsonResponse
 from django.db.models.functions import ExtractMonth
 from django.contrib import messages
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
-from fire.forms import LocationForm, IncidentForm, FireStationForm
+from fire.forms import LocationForm, IncidentForm, FireStationForm, FirefightersForm
 from typing import Any
 from django.db.models.query import QuerySet
 from django.db.models import Q
@@ -291,3 +291,33 @@ class FireStationDeleteView(DeleteView):
     model = FireStation
     template_name = 'firestations_del.html'
     success_url = reverse_lazy('firestations-list')
+
+class FirefightersList(ListView):
+    model = Firefighters
+    context_object_name = 'object_list'
+    template_name = 'firefighters_list.html'
+    paginate_by = 5
+
+    def get_queryset(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+        if self.request.GET.get('q'):
+            query = self.request.GET.get('q')
+            qs = qs.filter(Q(name__icontains=query) | Q(rank__icontains=query) | Q(experience_level__icontains=query) | Q(station__icontains=query))
+        return qs
+
+class FirefightersCreateView(CreateView):
+    model = Firefighters
+    form_class = FirefightersForm
+    template_name = 'firefighters_add.html'
+    success_url = reverse_lazy('firefighters-list')
+
+class FirefightersUpdateView(UpdateView):
+    model = Firefighters
+    form_class = FirefightersForm
+    template_name = 'firefighters_edit.html'
+    success_url = reverse_lazy('firefighters-list')
+
+class FirefightersDeleteView(DeleteView):
+    model = Firefighters
+    template_name = 'firefighters_del.html'
+    success_url = reverse_lazy('firefighters-list')

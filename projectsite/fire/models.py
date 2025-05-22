@@ -66,6 +66,9 @@ class Firefighters(BaseModel):
     experience_level = models.CharField(max_length=150)
     station = models.CharField(
         max_length=45, null=True, blank=True, choices=XP_CHOICES)
+    
+    def __str__(self):
+        return self.name
 
 
 class FireTruck(BaseModel):
