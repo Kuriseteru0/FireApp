@@ -33,20 +33,24 @@
                         <table class="table table-striped mt-3">
                             <thead>
                                 <tr>
-                                    <th scope="col">Date</th>
-                                    <th scope="col">Time</th>
-                                    <th scope="col">Severity Level</th>
-                                    <th scope="col">Description</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Latitude</th>
+                                    <th scope="col">Longitude</th>
+                                    <th scope="col">Address</th>
+                                    <th scope="col">City</th>
+                                    <th scope="col">Country</th>
                                     <th scope="col">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for object in object_list %}
                                 <tr>
-                                    <td>{{ object.date_time|date:"Y-m-d" }}</td>
-                                    <td>{{ object.date_time|time:"H:i" }}</td>
-                                    <td>{{ object.severity_level }}</td>
-                                    <td>{{ object.description }}</td>
+                                    <td>{{ object.name }}</td>
+                                    <td>{{ object.latitude }}</td>
+                                    <td>{{ object.longitude }}</td>
+                                    <td>{{ object.address }}</td>
+                                    <td>{{ object.city }}</td>
+                                    <td>{{ object.country }}</td>
                                     <td>
                                         <a href="{% url 'firestation-update' object.id %}">Edit</a>
                                         <a href="{% url 'firestation-delete' object.id %}" class="text-danger ml-2">Delete</a>
@@ -54,7 +58,7 @@
                                 </tr>
                                 {% empty %}
                                 <tr>
-                                    <td colspan="5" style="text-align: center">
+                                    <td colspan="7" style="text-align: center">
                                         <p class="text-sm font-weight-bold mb-0">No Records Found</p>
                                     </td>
                                 </tr>

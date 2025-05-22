@@ -7,7 +7,7 @@ from django.db.models.functions import ExtractMonth
 from django.contrib import messages
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
-from fire.forms import LocationForm, IncidentForm
+from fire.forms import LocationForm, IncidentForm, FireStationForm
 from typing import Any
 from django.db.models.query import QuerySet
 from django.db.models import Q
@@ -261,3 +261,33 @@ class IncidentDeleteView(DeleteView):
     model = Incident
     template_name = 'incidents_del.html'
     success_url = reverse_lazy('incident-list')
+
+class FireStationList(ListView):
+    model = FireStation
+    context_object_name = 'object_list'
+    template_name = 'firestations_list.html'
+    paginate_by = 5
+
+    def get_queryset(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+        if self.request.GET.get('q'):
+            query = self.request.GET.get('q')
+            qs = qs.filter(Q(name__icontains=query) | Q(address__icontains=query) | Q(city__icontains=query) | Q(country__icontains=query))
+        return qs
+
+class FireStationCreateView(CreateView):
+    model = FireStation
+    form_class = FireStationForm
+    template_name = 'firestations_add.html'
+    success_url = reverse_lazy('firestations-list')
+
+class FireStationUpdateView(UpdateView):
+    model = FireStation
+    form_class = FireStationForm
+    template_name = 'firestations_edit.html'
+    success_url = reverse_lazy('firestations-list')
+
+class FireStationDeleteView(DeleteView):
+    model = FireStation
+    template_name = 'firestations_del.html'
+    success_url = reverse_lazy('firestations-list')
