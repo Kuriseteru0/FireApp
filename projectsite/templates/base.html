@@ -269,27 +269,41 @@
       </div>
     </div>
 
+    <div id="toast-container" aria-live="polite" aria-atomic="true" style="position: fixed; bottom: 30px; right: 30px; z-index: 1050;">
+      <!-- Toasts will be dynamically inserted here -->
+    </div>
+
     {% if messages %}
     <script>
-      $(document).ready(function() {
+      document.addEventListener("DOMContentLoaded", function() {
         {% for message in messages %}
-          $.notify({
-            // You can use an icon here if you want
-            message: "{{ message|escapejs }}"
-          },{
-            type: "{% if message.tags %}{{ message.tags }}{% else %}info{% endif %}",
-            placement: {
-              from: "top",
-              align: "right"
-            },
-            delay: 2000,
-            allow_dismiss: true,
-            offset: {
-              x: 20,
-              y: 70
-            }
-          });
+          // Create a new toast element
+          var toastHTML = `
+          <div class="toast shadow-sm" role="alert" aria-live="assertive" aria-atomic="true" style="min-width:320px; border-radius: 10px; margin-bottom: 12px;" data-delay="3000">
+            <div class="toast-header" style="border-radius: 10px 10px 0 0; background: #f8f9fa;">
+              <img src="{% static 'img/icon.ico' %}" class="rounded mr-2" style="width: 20px; height: 20px;" alt="logo">
+              <strong class="mr-auto" style="font-size: 1rem;">Bootstrap</strong>
+              <small class="text-muted" style="font-size: 0.85rem;">Just now</small>
+              <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close" style="font-size: 1.2rem;">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="toast-body" style="font-size: 1rem; padding: 12px 16px;">
+              {{ message|escapejs }}
+            </div>
+          </div>
+          `;
+          // Append the toast to the toast container
+          document.getElementById('toast-container').insertAdjacentHTML('beforeend', toastHTML);
         {% endfor %}
+
+        // Initialize and show the toast(s)
+        var toastContainer = document.getElementById('toast-container');
+        var toastElements = toastContainer.querySelectorAll('.toast');
+        toastElements.forEach(function(toastElement) {
+          var toast = new bootstrap.Toast(toastElement);
+          toast.show();
+        });
       });
     </script>
     {% endif %}
@@ -308,7 +322,6 @@
     <script src="{% static 'js/plugin/jquery.sparkline/jquery.sparkline.min.js' %}"></script>
     <script src="{% static 'js/plugin/chart-circle/circles.min.js' %}"></script>
     <script src="{% static 'js/plugin/datatables/datatables.min.js' %}"></script>
-    <script src="{% static 'js/plugin/bootstrap-notify/bootstrap-notify.min.js' %}"></script>
     <script src="{% static 'js/plugin/jqvmap/jquery.vmap.min.js' %}"></script>
     <script src="{% static 'js/plugin/jqvmap/maps/jquery.vmap.world.js' %}"></script>
     <script src="{% static 'js/plugin/sweetalert/sweetalert.min.js' %}"></script>
