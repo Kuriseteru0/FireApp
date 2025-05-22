@@ -1,11 +1,7 @@
 from django.contrib import admin
 from django.urls import path
 
-<<<<<<< HEAD
-from fire.views import HomePageView, ChartView, PieCountbySeverity, LineCountByMonth, MultilineIncidentTop3City, multipleBarbySeverity, map_incidents, add_station, edit_station, delete_station, add_incident, edit_incident, delete_incident
-=======
 from fire.views import HomePageView, ChartView, PieCountbySeverity, LineCountByMonth, MultilineIncidentTop3Country, multipleBarbySeverity, map_incidents
->>>>>>> parent of eb981c7 (another chart fixes)
 from fire import views
 
 urlpatterns = [
@@ -18,10 +14,4 @@ urlpatterns = [
     path('multiBarChart/', multipleBarbySeverity, name='chart'),
     path('stations', views.map_station, name='map_station'),
     path('incidents', map_incidents, name='map_incidents'),
-    path('add_station', add_station, name='add_station'),
-    path('edit_station', edit_station, name='edit_station'),
-    path('delete_station', delete_station, name='delete_station'),
-    path('add_incident', add_incident, name='add_incident'),
-    path('edit_incident', edit_incident, name='edit_incident'),
-    path('delete_incident', delete_incident, name='delete_incident'),
 ]

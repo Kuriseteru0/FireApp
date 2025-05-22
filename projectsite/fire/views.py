@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render
 from django.views.generic.list import ListView
 from fire.models import Locations, Incident, FireStation
 from django.db import connection
@@ -168,8 +168,7 @@ def multipleBarbySeverity(request):
 
 
 def map_station(request):
-    stations = FireStation.objects.all()  # Query all stations
-    # Create a list for markers with float coordinates
+    stations = FireStation.objects.all()
     fireStations_list = [{
         'name': station.name,
         'latitude': float(station.latitude),
@@ -177,8 +176,8 @@ def map_station(request):
     } for station in stations]
 
     context = {
-        'fireStations': fireStations_list,  # used for displaying markers on the map
-        'stations': stations,                # used to populate select boxes for edit and delete
+        'fireStations': fireStations_list,
+        'stations': stations,
     }
     return render(request, 'map_station.html', context)
 
@@ -196,111 +195,4 @@ def map_incidents(request):
         'severity_levels': severity_levels,
     }
     return render(request, 'incidents_map.html', context)
-
-def add_station(request):
-    if request.method == 'POST':
-        station_name = request.POST.get('name')
-        latitude = request.POST.get('latitude')
-        longitude = request.POST.get('longitude')
-        try:
-            latitude = float(latitude)
-            longitude = float(longitude)
-            new_station = FireStation(name=station_name, latitude=latitude, longitude=longitude)
-            new_station.save()
-            messages.success(request, "Station added successfully!")
-        except Exception as e:
-            messages.error(request, "Error adding station: " + str(e))
-        return redirect('map_station')
-    return redirect('map_station')
-
-def edit_station(request):
-    if request.method == 'POST':
-        station_id = request.POST.get('station_id')
-        station = get_object_or_404(FireStation, id=station_id)
-        new_name = request.POST.get('new_name')
-        new_latitude = request.POST.get('new_latitude')
-        new_longitude = request.POST.get('new_longitude')
-        try:
-            if new_name:
-                station.name = new_name
-            if new_latitude:
-                station.latitude = float(new_latitude)
-            if new_longitude:
-                station.longitude = float(new_longitude)
-            station.save()
-            messages.info(request, "Station updated successfully!")
-        except Exception as e:
-            messages.error(request, "Error updating station: " + str(e))
-        return redirect('map_station')
-    return redirect('map_station')
-
-def delete_station(request):
-    if request.method == 'POST':
-        station_id = request.POST.get('station_id')
-        try:
-            station = FireStation.objects.get(id=station_id)
-            station.delete()
-            messages.error(request, "Station deleted successfully!")
-        except FireStation.DoesNotExist:
-            messages.error(request, "Station not found!")
-        return redirect('map_station')
-    return redirect('map_station')
-
-def add_incident(request):
-    if request.method == 'POST':
-        description = request.POST.get('description')
-        latitude = request.POST.get('latitude')
-        longitude = request.POST.get('longitude')
-        try:
-            latitude = float(latitude)
-            longitude = float(longitude)
-            # Create a new location record
-            location = Locations.objects.create(latitude=latitude, longitude=longitude)
-            # Create a new incident with the location and description
-            Incident.objects.create(location=location, description=description)
-            messages.success(request, "Incident added successfully!")
-        except Exception as e:
-            messages.error(request, "Error adding incident: " + str(e))
-        return redirect('map_incidents')
-    return redirect('map_incidents')
-
-def edit_incident(request):
-    if request.method == 'POST':
-        incident_id = request.POST.get('incident_id')
-        incident = get_object_or_404(Incident, id=incident_id)
-        new_description = request.POST.get('new_description')
-        new_latitude = request.POST.get('new_latitude')
-        new_longitude = request.POST.get('new_longitude')
-        try:
-            if new_description:
-                incident.description = new_description
-            if new_latitude and new_longitude:
-                new_lat = float(new_latitude)
-                new_lon = float(new_longitude)
-                # Update the related location record
-                location = incident.location
-                location.latitude = new_lat
-                location.longitude = new_lon
-                location.save()
-            incident.save()
-            messages.info(request, "Incident updated successfully!")
-        except Exception as e:
-            messages.error(request, "Error updating incident: " + str(e))
-        return redirect('map_incidents')
-    return redirect('map_incidents')
-
-def delete_incident(request):
-    if request.method == 'POST':
-        incident_id = request.POST.get('incident_id')
-        try:
-            incident = Incident.objects.get(id=incident_id)
-            # Optionally delete the associated location if not used elsewhere
-            location_id = incident.location.id
-            incident.delete()
-            Locations.objects.filter(id=location_id).delete()
-            messages.error(request, "Incident deleted successfully!")
-        except Incident.DoesNotExist:
-            messages.error(request, "Incident not found!")
-        return redirect('map_incidents')
-    return redirect('map_incidents')
 
